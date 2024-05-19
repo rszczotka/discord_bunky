@@ -31,7 +31,7 @@ print(Fore.YELLOW +'''
                                                                                              \______/  v3.0
                                                                                              
                                                                                                 
-                                                                                            GTAV Automatic Bunker Research bot arkis0
+                                                                                            GTAV Automatic Bunker Research bot rszczotka
       
 '''+ Style.RESET_ALL)
 

@@ -29,7 +29,7 @@ print('''
                                                                                              /$$  | $$
                                                                                             |  $$$$$$/
                                                                                              \______/  v3.0
-                                                                                            GTAV Automatic Bunker Research bot arkis0
+                                                                                            GTAV Automatic Bunker Research bot by rszczotka
 ''')
 
 begin_position = False

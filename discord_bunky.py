@@ -17,9 +17,9 @@ import colorama
 from colorama import Fore, Back, Style
 
 
-print(Fore.YELLOW +'''
-  /$$$$$$  /$$$$$$$$ /$$$$$$        /$$    /$$       /$$                           /$$                
- /$$__  $$|__  $$__//$$__  $$      | $$   | $$      | $$                          | $$                
+print(r'''
+  /$$$$$$  /$$$$$$$$ /$$$$$$        /$$    /$$       /$$                           /$$
+ /$$__  $$|__  $$__//$$__  $$      | $$   | $$      | $$                          | $$
 | $$  \__/   | $$  | $$  \ $$      | $$   | $$      | $$$$$$$  /$$   /$$ /$$$$$$$ | $$   /$$ /$$   /$$
 | $$ /$$$$   | $$  | $$$$$$$$      |  $$ / $$/      | $$__  $$| $$  | $$| $$__  $$| $$  /$$/| $$  | $$
 | $$|_  $$   | $$  | $$__  $$       \  $$ $$/       | $$  \ $$| $$  | $$| $$  \ $$| $$$$$$/ | $$  | $$
@@ -29,11 +29,8 @@ print(Fore.YELLOW +'''
                                                                                              /$$  | $$
                                                                                             |  $$$$$$/
                                                                                              \______/  v3.0
-                                                                                             
-                                                                                                
                                                                                             GTAV Automatic Bunker Research bot arkis0
-      
-'''+ Style.RESET_ALL)
+''')
 
 begin_position = False
 
@@ -142,6 +139,23 @@ async def discordSend(research_level, resource_amount):
             await webhook.send(file=image)
 
 
+def wait_for_image(image_path, region=None, grayscale=True, confidence=0.8, check_interval=1):
+    not_found_counter = 0
+    while True:
+        try:
+            location = pyautogui.locateOnScreen(image_path, region=region, grayscale=grayscale, confidence=confidence)
+            if location is not None:
+                print(f"Image found at: {location}")
+                return location
+            else:
+                not_found_counter += 1
+                print(f"Image not found, retrying... ({not_found_counter})", end='\r')
+        except pyautogui.ImageNotFoundException:
+            not_found_counter += 1
+            print(f"Image not found, retrying... ({not_found_counter})", end='\r')
+        time.sleep(check_interval)  # Wait for a specified interval before checking again
+
+
 time.sleep(2)
 
 starting_setup = False
@@ -149,11 +163,12 @@ last_buy_time = 0
 print("Bot won't start until you enter laptop home screen!")
 while keyboard.is_pressed('q') == False:
     while starting_setup == False:
-        if pyautogui.locateOnScreen('laptop_home_screen_logo.png', region=(0, 0, 1919, 1079), grayscale=True, confidence=0.8) != None:
-            print("Laptop home screen detected! Bot is starting")
-            starting_setup = True
-            time.sleep(0.5)
-            click(941, 645)
+        # Wait for the laptop home screen logo to appear
+        wait_for_image('laptop_home_screen_logo.png', region=(0, 0, 1919, 1079), grayscale=True, confidence=0.8)
+        print("Laptop home screen detected! Bot is starting")
+        starting_setup = True
+        time.sleep(0.5)
+        click(941, 645)
             
     research_level = check_progress_of_research()
     screenshot_of_current_project()
@@ -164,19 +179,22 @@ while keyboard.is_pressed('q') == False:
     time_of_check = time.time()
     print("Anti-kick started working! Next resource check in 15 minutes. Message from: ", time.ctime())
     while time.time() - time_of_check <= 900:
-        if pyautogui.locateOnScreen('kick_time.png', region=(0, 0, 820, 1079), grayscale=True, confidence=0.8) != None:
-            print("Kick message detected. Proceeding with activity")
-            mouse.drag(0, 630, 1919, 630, absolute=True, duration=2)
-            mouse.drag(1919, 630, 0, 630, absolute=True, duration=2)
-            activity_detected = False
-            while activity_detected == False:
-                if pyautogui.locateOnScreen('kick_time.png', region=(0, 0, 820, 1079), grayscale=True, confidence=0.8) == None:
-                    print("Activity was detected by game")
-                    activity_detected = True
-                else:
-                    print("Activity was not detected by game! Retrying")
-                    mouse.drag(0, 630, 1919, 630, absolute=True, duration=2)
-                    mouse.drag(1919, 630, 0, 630, absolute=True, duration=2)
+        try:
+            if pyautogui.locateOnScreen('kick_time.png', region=(0, 0, 820, 1079), grayscale=True, confidence=0.8) != None:
+                print("Kick message detected. Proceeding with activity")
+                mouse.drag(0, 630, 1919, 630, absolute=True, duration=2)
+                mouse.drag(1919, 630, 0, 630, absolute=True, duration=2)
+                activity_detected = False
+                while activity_detected == False:
+                    if pyautogui.locateOnScreen('kick_time.png', region=(0, 0, 820, 1079), grayscale=True, confidence=0.8) == None:
+                        print("Activity was detected by game")
+                        activity_detected = True
+                    else:
+                        print("Activity was not detected by game! Retrying")
+                        mouse.drag(0, 630, 1919, 630, absolute=True, duration=2)
+                        mouse.drag(1919, 630, 0, 630, absolute=True, duration=2)
+        except pyautogui.ImageNotFoundException:
+            pass
     keyboard.press_and_release('enter')
     time.sleep(3)
     if pyautogui.locateOnScreen('laptop_home_screen_logo.png', region=(0, 0, 1919, 1079), grayscale=True, confidence=0.8) != None:
